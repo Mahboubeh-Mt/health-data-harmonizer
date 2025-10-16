@@ -1,7 +1,10 @@
 ## 🩺 Health-Data-Harmonizer
 
 **Turning messy health data into clean, consistent science.**
-![CI](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml/badge.svg)
+
+[![CI](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml)
+
+[![codecov](https://codecov.io/gh/Mahboubeh-Mt/health-data-harmonizer/branch/main/graph/badge.svg)](https://codecov.io/gh/Mahboubeh-Mt/health-data-harmonizer)
 
 ### 💡 The Story
 
@@ -12,11 +15,8 @@ During my PhD research on brain aging and diabetes, I faced this daily.
 What should’ve been a simple merge turned into hours of detective work:
 
 - HbA1c could appear in % or mmol/mol
-
 - Sex could be F/M, 1/2, or female/male
-
 - Education could be measured in years or months
-
 - Glucose, LDL, and HDL could switch between mg/dL and mmol/L
 
 Each dataset needed its own fragile preprocessing pipeline — hard to reuse, harder to trust.
