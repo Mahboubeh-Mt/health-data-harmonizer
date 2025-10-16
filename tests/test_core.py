@@ -57,9 +57,8 @@ def test_transform_basic_with_hba1c_mmolmol_and_binary_diabetes():
         "ldl_mmol_L",
         "hdl_mmol_L",
     }
-    assert expected_cols.issuperset(
-        set(clean.columns)
-    ), f"Missing: {expected_cols - set(clean.columns)}"
+    missing = expected_cols - set(clean.columns)
+    assert expected_cols.issuperset(set(clean.columns)), f"Missing: {missing}"
 
     # Sex encoding (2=female->0, 1=male->1)
     assert clean["sex"].tolist() == [0, 1]
