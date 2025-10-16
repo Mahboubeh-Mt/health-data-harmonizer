@@ -1,6 +1,7 @@
 ## 🩺 Health-Data-Harmonizer
 
 **Turning messy health data into clean, consistent science.**
+![CI](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml/badge.svg)
 
 ### 💡 The Story
 
