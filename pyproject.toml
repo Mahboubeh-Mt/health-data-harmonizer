@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "health-data-harmonizer"
+version = "0.1.0"
+description = "Opinionated, reproducible harmonization for common health variables across cohorts."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{ name = "Mahboubeh Motaghi", email = "you@example.com" }]
+dependencies = [
+  "pandas>=2.0",
+  "numpy>=1.24",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov>=4.1", "ruff>=0.5.0", "pre-commit>=3.7"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+select = ["E","F","I","UP"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
