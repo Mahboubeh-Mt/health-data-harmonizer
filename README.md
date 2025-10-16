@@ -2,7 +2,7 @@
 
 **Turning messy health data into clean, consistent science.**
 
-[![CI](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml)
+[![CI](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml/badge.svg?branch=main&event=push&ts=3)](https://github.com/Mahboubeh-Mt/health-data-harmonizer/actions/workflows/ci.yml?query=branch%3Amain+event%3Apush)
 
 [![codecov](https://codecov.io/gh/Mahboubeh-Mt/health-data-harmonizer/branch/main/graph/badge.svg)](https://codecov.io/gh/Mahboubeh-Mt/health-data-harmonizer)
 
