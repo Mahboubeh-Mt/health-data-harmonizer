@@ -1,9 +1,9 @@
 aliases:
-  age: ["age","Age","AGE","AgeYears","AGE_AT_SCAN"]          # expanded
+  age: ["age","Age","AGE","AgeYears","AGE_AT_SCAN"]
   sex: ["sex","gender","biological_sex"]
   education: ["education","edu_years","edu_months","years_edu"]
   glucose: ["glucose","fpg","glucose_fasting","GLU"]
-  hba1c: ["hba1c","HbA1c","A1C","hemoglobin A1c","glycated_hemoglobin"]  # NEW
+  hba1c: ["hba1c","HbA1c","A1C","hemoglobin A1c","glycated_hemoglobin"]
   diabetes_status: ["diabetes","dm_status","diab"]
   hypertension: ["htn","hypertension","bp_htn"]
   systolic_bp: ["sbp","systolic","bp_sys","systolic_bp"]
@@ -12,24 +12,26 @@ aliases:
 
 encodings:
   sex:
-    F: 0
-    M: 1
-    female: 0
-    male: 1
-    2: 0     # 2=female
-    1: 1     # 1=male
-  diabetes_status:               # BINARY ONLY
-    no: 0
-    yes: 1
+    "F": 0
+    "M": 1
+    "female": 0
+    "male": 1
+    2: 0
+    1: 1
+
+  diabetes_status:  # binary only
+    "no": 0
+    "yes": 1
     0: 0
     1: 1
-    controlled: 1
-    uncontrolled: 1
+    "controlled": 1
+    "uncontrolled": 1
     true: 1
     false: 0
+
   hypertension:
-    no: 0
-    yes: 1
+    "no": 0
+    "yes": 1
     0: 0
     1: 1
     true: 1
@@ -42,7 +44,7 @@ impute:
   age: median
   education_years: median
   glucose_mmol_L: median
-  hba1c_percent: median            # NEW
+  hba1c_percent: median
   ldl_mmol_L: median
   hdl_mmol_L: median
   systolic_bp_mmHg: median
@@ -53,7 +55,7 @@ impute:
 ranges:
   age: [18, 100]
   glucose_mmol_L: [2, 30]
-  hba1c_percent: [3, 20]          # NEW (broad clinical bounds)
+  hba1c_percent: [3, 20]
   ldl_mmol_L: [0.5, 10]
   hdl_mmol_L: [0.3, 4]
   systolic_bp_mmHg: [70, 250]

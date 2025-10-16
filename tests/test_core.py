@@ -1,5 +1,5 @@
-import math
 import pandas as pd
+
 from health_data_harmonizer import Harmonizer
 
 harm = Harmonizer.from_yaml("src/health_data_harmonizer/configs/default.yaml")
@@ -20,18 +20,20 @@ def test_transform_basic_with_hba1c_mmolmol_and_binary_diabetes():
       - LDL/HDL in mg/dL (→ mmol/L)
       - sbp (→ systolic_bp_mmHg)
     """
-    df = pd.DataFrame({
-        "AgeYears": [65, 72],
-        "gender": [2, 1],                     # 2=female -> 0, 1=male -> 1
-        "edu_months": [192, 156],             # months → years (16, 13)
-        "GLU": [108, 90],                     # mg/dL → mmol/L (6.0, 5.0)
-        "hba1c": [53, 42],                    # mmol/mol → % ((x+2.15)/10.929)
-        "dm_status": ["no", "controlled"],    # binary -> 0, 1
-        "htn": [0, 1],                        # binary stays
-        "sbp": [120, 142],                    # → systolic_bp_mmHg
-        "LDL_mg_dL": [130, 100],              # mg/dL → mmol/L
-        "HDL_mg_dL": [50, 60],                # mg/dL → mmol/L
-    })
+    df = pd.DataFrame(
+        {
+            "AgeYears": [65, 72],
+            "gender": [2, 1],  # 2=female -> 0, 1=male -> 1
+            "edu_months": [192, 156],  # months → years (16, 13)
+            "GLU": [108, 90],  # mg/dL → mmol/L (6.0, 5.0)
+            "hba1c": [53, 42],  # mmol/mol → % ((x+2.15)/10.929)
+            "dm_status": ["no", "controlled"],  # binary -> 0, 1
+            "htn": [0, 1],  # binary stays
+            "sbp": [120, 142],  # → systolic_bp_mmHg
+            "LDL_mg_dL": [130, 100],  # mg/dL → mmol/L
+            "HDL_mg_dL": [50, 60],  # mg/dL → mmol/L
+        }
+    )
 
     clean, log = harm.transform(
         df,
@@ -43,14 +45,21 @@ def test_transform_basic_with_hba1c_mmolmol_and_binary_diabetes():
         },
     )
 
-    # Columns present
     expected_cols = {
-        "age", "sex", "education_years",
-        "glucose_mmol_L", "hba1c_percent",
-        "diabetes_status", "hypertension", "systolic_bp_mmHg",
-        "ldl_mmol_L", "hdl_mmol_L"
+        "age",
+        "sex",
+        "education_years",
+        "glucose_mmol_L",
+        "hba1c_percent",
+        "diabetes_status",
+        "hypertension",
+        "systolic_bp_mmHg",
+        "ldl_mmol_L",
+        "hdl_mmol_L",
     }
-    assert expected_cols.issuperset(set(clean.columns)), f"Missing columns: {expected_cols - set(clean.columns)}"
+    assert expected_cols.issuperset(
+        set(clean.columns)
+    ), f"Missing: {expected_cols - set(clean.columns)}"
 
     # Sex encoding (2=female->0, 1=male->1)
     assert clean["sex"].tolist() == [0, 1]
@@ -64,7 +73,6 @@ def test_transform_basic_with_hba1c_mmolmol_and_binary_diabetes():
     assert approx(clean["glucose_mmol_L"].iloc[1], 90 / 18.0)
 
     # HbA1c mmol/mol → %
-    # % = (mmol/mol + 2.15) / 10.929
     expected_a1c0 = (53 + 2.15) / 10.929
     expected_a1c1 = (42 + 2.15) / 10.929
     assert approx(clean["hba1c_percent"].iloc[0], expected_a1c0)
@@ -74,7 +82,6 @@ def test_transform_basic_with_hba1c_mmolmol_and_binary_diabetes():
     assert clean["diabetes_status"].tolist() == [0, 1]
 
     # Systolic rename
-    assert "systolic_bp_mmHg" in clean.columns
     assert clean["systolic_bp_mmHg"].tolist() == [120, 142]
 
     # LDL/HDL mg/dL → mmol/L (×0.02586)
@@ -83,10 +90,9 @@ def test_transform_basic_with_hba1c_mmolmol_and_binary_diabetes():
     assert approx(clean["hdl_mmol_L"].iloc[0], 50 * 0.02586)
     assert approx(clean["hdl_mmol_L"].iloc[1], 60 * 0.02586)
 
-    # Basic log sanity
+    # Log sanity
     assert any("glucose→mmol/L" in s for s in log["unit_conversions"])
     assert any("hba1c→%" in s for s in log["unit_conversions"])
-    assert "renames" in log and isinstance(log["renames"], dict)
 
 
 def test_transform_aliases_percent_and_strings_binary_diabetes():
@@ -98,22 +104,24 @@ def test_transform_aliases_percent_and_strings_binary_diabetes():
       - HbA1c already in % (no conversion)
       - diabetes contains 'uncontrolled' and 'no' → 1 and 0 (binary)
       - hypertension as true/false strings → 1/0
-      - systolic alias 'systolic' (allowed in aliases)
+      - systolic alias 'systolic'
       - LDL/HDL already mmol/L (no conversion)
       - HbA1c alias: 'hemoglobin A1c'
     """
-    df = pd.DataFrame({
-        "AGE": [61, 69],
-        "sex": ["F", "M"],
-        "education": [14, 12],
-        "glucose": [6.1, 5.4],                 # already mmol/L
-        "hemoglobin A1c": [6.2, 5.7],          # already %
-        "diabetes": ["uncontrolled", "no"],    # -> 1, 0
-        "hypertension": ["true", "false"],     # -> 1, 0
-        "systolic": [128, 118],
-        "ldl": [2.8, 3.2],                     # already mmol/L
-        "hdl": [1.3, 1.1],                     # already mmol/L
-    })
+    df = pd.DataFrame(
+        {
+            "AGE": [61, 69],
+            "sex": ["F", "M"],
+            "education": [14, 12],
+            "glucose": [6.1, 5.4],  # already mmol/L
+            "hemoglobin A1c": [6.2, 5.7],  # already %
+            "diabetes": ["uncontrolled", "no"],  # -> 1, 0
+            "hypertension": ["true", "false"],  # -> 1, 0
+            "systolic": [128, 118],
+            "ldl": [2.8, 3.2],  # already mmol/L
+            "hdl": [1.3, 1.1],  # already mmol/L
+        }
+    )
 
     clean, log = harm.transform(
         df,
@@ -130,20 +138,20 @@ def test_transform_aliases_percent_and_strings_binary_diabetes():
     assert "hba1c_percent" in clean.columns
     assert "systolic_bp_mmHg" in clean.columns
 
-    # Sex encoding F/M -> 0/1
+    # Sex F/M -> 0/1
     assert clean["sex"].tolist() == [0, 1]
 
-    # Diabetes 'uncontrolled'/'no' -> 1/0 (binary)
+    # Diabetes 'uncontrolled'/'no' -> 1/0
     assert clean["diabetes_status"].tolist() == [1, 0]
 
     # Hypertension 'true'/'false' -> 1/0
     assert clean["hypertension"].tolist() == [1, 0]
 
-    # Glucose stays the same (already mmol/L)
+    # Glucose stays (already mmol/L)
     assert approx(clean["glucose_mmol_L"].iloc[0], 6.1)
     assert approx(clean["glucose_mmol_L"].iloc[1], 5.4)
 
-    # HbA1c stays the same (already %)
+    # HbA1c stays (already %)
     assert approx(clean["hba1c_percent"].iloc[0], 6.2)
     assert approx(clean["hba1c_percent"].iloc[1], 5.7)
 
@@ -153,5 +161,5 @@ def test_transform_aliases_percent_and_strings_binary_diabetes():
     assert approx(clean["hdl_mmol_L"].iloc[0], 1.3)
     assert approx(clean["hdl_mmol_L"].iloc[1], 1.1)
 
-    # Education already in years
+    # Education already years
     assert clean["education_years"].tolist() == [14, 12]

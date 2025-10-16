@@ -1,34 +1,53 @@
 from __future__ import annotations
-import yaml
+
 import pandas as pd
+import yaml
+
 from .utils import (
-    coerce_numeric, map_alias, convert_glucose_to_mmol,
-    convert_chol_to_mmol, encode_cat, guess_edu_is_months,
-    convert_hba1c_to_percent,  # NEW
+    coerce_numeric,
+    convert_chol_to_mmol,
+    convert_glucose_to_mmol,
+    convert_hba1c_to_percent,
+    encode_cat,
+    guess_edu_is_months,
+    map_alias,
 )
 
 CANONICAL_ORDER = [
-    "age","sex","education_years",
-    "glucose_mmol_L","hba1c_percent",     # NEW
-    "diabetes_status","hypertension",
-    "systolic_bp_mmHg","ldl_mmol_L","hdl_mmol_L"
+    "age",
+    "sex",
+    "education_years",
+    "glucose_mmol_L",
+    "hba1c_percent",
+    "diabetes_status",
+    "hypertension",
+    "systolic_bp_mmHg",
+    "ldl_mmol_L",
+    "hdl_mmol_L",
 ]
+
 
 class Harmonizer:
     def __init__(self, config: dict):
         self.cfg = config
 
     @classmethod
-    def from_yaml(cls, path: str) -> "Harmonizer":
-        with open(path, "r") as f:
+    def from_yaml(cls, path: str) -> Harmonizer:
+        with open(path) as f:
             cfg = yaml.safe_load(f)
         return cls(cfg)
 
     def transform(self, df: pd.DataFrame, source_units: dict | None = None):
         x = df.copy()
-        log = {"renames":{}, "unit_conversions":[], "encodings":[], "imputations":[], "range_flags":[]}
+        log = {
+            "renames": {},
+            "unit_conversions": [],
+            "encodings": [],
+            "imputations": [],
+            "range_flags": [],
+        }
         aliases = self.cfg["aliases"]
-        enc = self.cfg["encodings"]
+        enc = self.cfg.get("encodings", {})  # robust if key missing
         ranges = self.cfg["ranges"]
         impute = self.cfg["impute"]
         edu_cfg = self.cfg["education"]
@@ -44,16 +63,16 @@ class Harmonizer:
             log["renames"] = rename_map
 
         # 2) numeric coercion
-        for c in ["age","education","glucose","hba1c","ldl","hdl","systolic_bp"]:  # + hba1c
+        for c in ["age", "education", "glucose", "hba1c", "ldl", "hdl", "systolic_bp"]:
             if c in x.columns:
                 x[c] = coerce_numeric(x[c])
 
         # 3) units
-        su = (source_units or {})
+        su = source_units or {}
         if "glucose" in x.columns:
             x["glucose_mmol_L"] = convert_glucose_to_mmol(x["glucose"], su.get("glucose"))
             log["unit_conversions"].append("glucose→mmol/L")
-        if "hba1c" in x.columns:  # NEW
+        if "hba1c" in x.columns:
             x["hba1c_percent"] = convert_hba1c_to_percent(x["hba1c"], su.get("hba1c"))
             log["unit_conversions"].append("hba1c→%")
         if "ldl" in x.columns:
@@ -72,11 +91,11 @@ class Harmonizer:
                 x["education_years"] = x["education"]
 
         # 5) categorical encodings
-        if "sex" in x.columns:
+        if "sex" in x.columns and "sex" in enc:
             x["sex"] = encode_cat(x["sex"], enc["sex"])
-        if "diabetes_status" in x.columns:
+        if "diabetes_status" in x.columns and "diabetes_status" in enc:
             x["diabetes_status"] = encode_cat(x["diabetes_status"], enc["diabetes_status"])
-        if "hypertension" in x.columns:
+        if "hypertension" in x.columns and "hypertension" in enc:
             x["hypertension"] = encode_cat(x["hypertension"], enc["hypertension"])
 
         # 6) systolic label
